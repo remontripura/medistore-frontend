@@ -6,11 +6,11 @@ export const sellerRoutes: Route[] = [
     items: [
       {
         title: "Add Medicine",
-        url: "/seller-dashboard/add-medicine",
+        url: "/dashboard/add-medicine",
       },
       {
         title: "My Medicine",
-        url: "/seller-dashboard/history",
+        url: "/dashboard/history",
       },
     ],
   },

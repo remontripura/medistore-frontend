@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { Medicine } from "@/types";
 import { cookies } from "next/headers";
 
 const API_URL = env.API_URL;
@@ -43,7 +44,7 @@ export const medicineServices = {
         config.next = { revalidate: options.revalidate };
       }
 
-      config.next = { ...config.next, tags: ["blogPosts"] };
+      config.next = { ...config.next, tags: ["medicine"] };
 
       const res = await fetch(url.toString(), config);
       const data = await res.json();
@@ -65,25 +66,23 @@ export const medicineServices = {
     }
   },
 
-  createBlogPost: async (blogData: BlogData) => {
+  addMedicine: async (medicineData: Medicine) => {
     try {
       const cookieStore = await cookies();
 
-      const res = await fetch(`${API_URL}/posts`, {
+      const res = await fetch(`${API_URL}/medicine`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Cookie: cookieStore.toString(),
         },
-        body: JSON.stringify(blogData),
+        body: JSON.stringify(medicineData),
       });
-
       const data = await res.json();
-
       if (data.error) {
         return {
           data: null,
-          error: { message: "Error: Post not created." },
+          error: { message: "Medicine Add Succefully." },
         };
       }
 

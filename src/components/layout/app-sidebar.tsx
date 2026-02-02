@@ -30,7 +30,7 @@ export function AppSidebar({
     case Roles.admin:
       routes = adminRoutes;
       break;
-    case Roles.customer:
+    case Roles.seller:
       routes = sellerRoutes;
       break;
     default:
