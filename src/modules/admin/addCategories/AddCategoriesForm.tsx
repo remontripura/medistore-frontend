@@ -2,23 +2,21 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
+    Field,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
 import { useForm } from "@tanstack/react-form";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -27,16 +25,17 @@ type UserWithRole = {
 };
 
 const formSchema = z.object({
-  password: z.string().min(8, "Minimum length is 8"),
-  email: z.email(),
+  name: z.string(),
+  slug: z.email(),
 });
 
-export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const router = useRouter();
+export function AddCategoriesForm({
+  ...props
+}: React.ComponentProps<typeof Card>) {
   const form = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      name: "",
+      slug: "",
     },
     validators: {
       onSubmit: formSchema,
@@ -44,18 +43,6 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("Logging in");
       try {
-        const { data, error } = await authClient.signIn.email(value);
-        if (data?.user && "role" in data.user) {
-          const user = data.user as typeof data.user & UserWithRole;
-          if (user.role === "ADMIN" || "SELLER") {
-            router.push("/dashboard");
-          }
-        }
-        if (error) {
-          toast.error(error.message, { id: toastId });
-          return;
-        }
-        toast.success("User Logged in Successfully", { id: toastId });
       } catch (err) {
         toast.error("Something went wrong, please try again.", { id: toastId });
       }
@@ -80,7 +67,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
         >
           <FieldGroup>
             <form.Field
-              name="email"
+              name="name"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
@@ -102,7 +89,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
               }}
             />
             <form.Field
-              name="password"
+              name="slug"
               children={(field) => {
                 const isInvalid =
                   field.state.meta.isTouched && !field.state.meta.isValid;
