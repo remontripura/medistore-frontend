@@ -9,11 +9,11 @@ import { userService } from "@/services/user.service";
 
 export default async function DashboardLayout({
   admin,
-  user,
+  seller,
 }: {
   children: React.ReactNode;
   admin: React.ReactNode;
-  user: React.ReactNode;
+  seller: React.ReactNode;
 }) {
   const { data } = await userService.getSession();
 
@@ -27,7 +27,7 @@ export default async function DashboardLayout({
           <SidebarTrigger className="-ml-1" />
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
-          {userInfo.role === Roles.admin ? admin : user}
+          {userInfo.role === Roles.admin ? admin : seller}
         </div>
       </SidebarInset>
     </SidebarProvider>

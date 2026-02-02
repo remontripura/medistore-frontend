@@ -9,8 +9,8 @@ export const adminRoutes: Route[] = [
         url: "/admin-dashboard/add-categories",
       },
       {
-        title: "All User",
-        url: "/all-user",
+        title: "Users",
+        url: "/admin-dashboard/users",
       },
     ],
   },

@@ -1,16 +1,16 @@
 import { Route } from "@/types";
 
-export const userRoutes: Route[] = [
+export const sellerRoutes: Route[] = [
   {
-    title: "Blog Management",
+    title: "Seller Management",
     items: [
       {
-        title: "Create Blog",
-        url: "/dashboard/create-blog",
+        title: "Add Medicine",
+        url: "/seller-dashboard/add-medicine",
       },
       {
-        title: "History",
-        url: "/dashboard/history",
+        title: "My Medicine",
+        url: "/seller-dashboard/history",
       },
     ],
   },

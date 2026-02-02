@@ -1,20 +1,19 @@
 import PaginationControls from "@/components/ui/pagination-controls";
-import { AddCategoriesForm } from "@/modules/admin/addCategories/AddCategoriesForm";
-import { AllCategories } from "@/modules/admin/addCategories/AllCategories";
-import { categoriesServices } from "@/services/categories.services";
+import { GetAllUsers } from "@/modules/admin/users/GetAllUsers";
+import { usersServices } from "@/services/adminUsers";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Medistore | Admin Dashboard",
   description: "Admin Dashboard",
 };
-export default async function AddCAtegories({
+export default async function AllUsers({
   searchParams,
 }: {
   searchParams: Promise<{ page: string }>;
 }) {
   const { page } = await searchParams;
-  const { data } = await categoriesServices.getCategoris({ page });
+  const { data } = await usersServices.getAllUsers({ page });
   const pagination = data?.pagination || {
     limit: 10,
     page: 1,
@@ -24,8 +23,7 @@ export default async function AddCAtegories({
   return (
     <section>
       <div className=" px-3">
-        <AddCategoriesForm />
-        <AllCategories categoryData={data} />
+        <GetAllUsers users={data} />
         <PaginationControls meta={pagination} />
       </div>
     </section>

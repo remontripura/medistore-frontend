@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { Categories, CategoryType, Pagination } from "@/types";
+import { Pagination, UserType } from "@/types";
 import { cookies } from "next/headers";
 
 interface ServiceOptions {
@@ -20,15 +20,13 @@ export interface categoryResponse<T> {
 
 const API_URL = env.API_URL;
 
-export const categoriesServices = {
-  getCategoris: async function (
+export const usersServices = {
+  getAllUsers: async function (
     params?: GetBlogsParams,
     options?: ServiceOptions,
-  ): Promise<
-    categoryResponse<{ data: CategoryType[]; pagination: Pagination }>
-  > {
+  ): Promise<categoryResponse<{ data: UserType[]; pagination: Pagination }>> {
     try {
-      const url = new URL(`${API_URL}/categories`);
+      const url = new URL(`${API_URL}/user/admin`);
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== "") {
@@ -45,32 +43,45 @@ export const categoriesServices = {
       if (options?.revalidate) {
         config.next = { revalidate: options.revalidate };
       }
-
-      config.next = { ...config.next, tags: ["categories"] };
-
-      const res = await fetch(url.toString(), config);
+      config.next = { ...config.next, tags: ["user"] };
+      const cookieStore = await cookies();
+      const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieStore.toString(),
+        },
+        cache: options?.cache,
+        next: {
+          revalidate: options?.revalidate,
+          tags: ["user"],
+        },
+      });
       const data = await res.json();
       return { data: data, error: null };
     } catch (err) {
       return { data: null, error: { message: "Something Went Wrong" } };
     }
   },
-  createCategories: async (categories: Categories) => {
+  updateUserStatus: async (
+    userStatus: { status: string },
+    userId: string,
+  ) => {
     try {
       const cookieStore = await cookies();
-      const res = await fetch(`${API_URL}/categories`, {
-        method: "POST",
+      const res = await fetch(`${API_URL}/user/admin/${userId}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Cookie: cookieStore.toString(),
         },
-        body: JSON.stringify(categories),
+        body: JSON.stringify(userStatus),
       });
       const data = await res.json();
       if (data.error) {
         return {
           data: null,
-          error: { message: "Error: Post not created." },
+          error: { message: "Error: Update Faild." },
         };
       }
       return { data: data, error: null };

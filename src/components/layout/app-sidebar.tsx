@@ -16,7 +16,7 @@ import Link from "next/link";
 import { Route } from "@/types";
 import { Roles } from "@/constants/roles";
 import { adminRoutes } from "../routes/adminRoutes";
-import { userRoutes } from "../routes/sellerRoutes";
+import { sellerRoutes } from "../routes/sellerRoutes";
 
 export function AppSidebar({
   user,
@@ -31,7 +31,7 @@ export function AppSidebar({
       routes = adminRoutes;
       break;
     case Roles.customer:
-      routes = userRoutes;
+      routes = sellerRoutes;
       break;
     default:
       routes = [];
