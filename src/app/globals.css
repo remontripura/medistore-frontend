@@ -4,6 +4,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-roboto: "Roboto", serif;
+}
+@theme {
+  --color-primarydeep: #50A2FF;
+  --color-primarylite: #8ec5ff;
+}
+
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

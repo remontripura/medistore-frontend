@@ -1,3 +1,4 @@
+import RootNavbar from "@/modules/customer/rootpage/navbarAndfooter/Navbar";
 
 export default function CommonLayout({
   children,
@@ -6,6 +7,7 @@ export default function CommonLayout({
 }) {
   return (
     <div>
+      <RootNavbar />
       {children}
     </div>
   );

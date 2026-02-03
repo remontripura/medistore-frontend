@@ -70,17 +70,15 @@ export function AddMedicineComponent({
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("submitted");
       setLoading(true);
       try {
         const { stock, ...rest } = value;
         const finalValue = { ...rest, stock: Number(stock) };
         const { data } = await addMedicineAction(finalValue);
-        console.log(data);
         toast.success("Add Category Succefully!", {
           position: "top-center",
         });
-        // form.reset();
+        form.reset();
         setLoading(false);
       } catch (err) {
         setLoading(false);

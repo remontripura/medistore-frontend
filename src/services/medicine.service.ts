@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import { Medicine } from "@/types";
+import { Medicine, Pagination, Product, updateMedicine } from "@/types";
 import { cookies } from "next/headers";
 
 const API_URL = env.API_URL;
@@ -7,24 +7,23 @@ interface ServiceOptions {
   cache?: RequestCache;
   revalidate?: number;
 }
-interface GetBlogsParams {
+interface getMedicinsParams {
   isFeatured?: boolean;
   search?: string;
   page?: string;
   limit?: string;
 }
 
-export interface BlogData {
-  title: string;
-  content: string;
-  tag?: string[];
+export interface medicineResponse<T> {
+  data: T | null;
+  error: { message: string } | null;
 }
 
 export const medicineServices = {
   getMedicine: async function (
-    params?: GetBlogsParams,
+    params?: getMedicinsParams,
     options?: ServiceOptions,
-  ) {
+  ): Promise<medicineResponse<{ data: Product[]; pagination: Pagination }>> {
     try {
       const url = new URL(`${API_URL}/medicine`);
       if (params) {
@@ -86,6 +85,51 @@ export const medicineServices = {
         };
       }
 
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+  updateMedicine: async (medicineData: updateMedicine, medicineId: string) => {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${API_URL}/medicine/${medicineId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieStore.toString(),
+        },
+        body: JSON.stringify(medicineData),
+      });
+      const data = await res.json();
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Update Faild." },
+        };
+      }
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+  deleteMedicine: async (medicineId: string) => {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${API_URL}/medicine/${medicineId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieStore.toString(),
+        },
+      });
+      const data = await res.json();
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Delete Faild." },
+        };
+      }
       return { data: data, error: null };
     } catch (err) {
       return { data: null, error: { message: "Something Went Wrong" } };
