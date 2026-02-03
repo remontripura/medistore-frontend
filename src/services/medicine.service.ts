@@ -1,5 +1,11 @@
 import { env } from "@/env";
-import { Medicine, Pagination, Product, updateMedicine } from "@/types";
+import {
+  Medicine,
+  MedicineDetails,
+  Pagination,
+  Product,
+  updateMedicine,
+} from "@/types";
 import { cookies } from "next/headers";
 
 const API_URL = env.API_URL;
@@ -53,12 +59,12 @@ export const medicineServices = {
     }
   },
 
-  getBlogById: async function (id: string) {
+  getMedicineById: async function (
+    id: string,
+  ): Promise<medicineResponse<{ data: MedicineDetails }>> {
     try {
-      const res = await fetch(`${API_URL}/posts/${id}`);
-
+      const res = await fetch(`${API_URL}/medicine/${id}`);
       const data = await res.json();
-
       return { data: data, error: null };
     } catch (err) {
       return { data: null, error: { message: "Something Went Wrong" } };

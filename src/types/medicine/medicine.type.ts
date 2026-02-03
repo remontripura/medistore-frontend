@@ -25,6 +25,19 @@ export interface Product {
   updatedAt: string;
 }
 
+export interface MedicineDetails {
+  id: string;
+  images: string;
+  name: string;
+  price: string;
+  discount: string;
+  stock: number;
+  avg_review: number;
+  total_review: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface updateMedicine {
   name: string | undefined;
   price: string | undefined;
