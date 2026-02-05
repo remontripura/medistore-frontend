@@ -6,6 +6,10 @@ interface ServiceOptions {
   cache?: RequestCache;
   revalidate?: number;
 }
+export interface orderValue {
+  status: "APPROVED" | "REJECT";
+}
+
 interface getMedicinsParams {
   isFeatured?: boolean;
   search?: string;
@@ -84,6 +88,29 @@ export const orderServices = {
         };
       }
 
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+  updateOrder: async (orderData: orderValue, orderId: string) => {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${API_URL}/order/${orderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieStore.toString(),
+        },
+        body: JSON.stringify(orderData),
+      });
+      const data = await res.json();
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Update Faild." },
+        };
+      }
       return { data: data, error: null };
     } catch (err) {
       return { data: null, error: { message: "Something Went Wrong" } };

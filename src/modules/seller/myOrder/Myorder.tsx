@@ -1,5 +1,6 @@
 "use client";
 
+import { updateOrderAction } from "@/actions/order.action";
 import { formatDate } from "@/components/shared/DateFormate/DateFormate";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +34,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 const formSchema = z.object({
-  status: z.enum(["PENDING", "APPROVED", "REJECT"]),
+  status: z.enum(["APPROVED", "REJECT"]),
 });
 
 export default function MyOrder({
@@ -47,7 +48,7 @@ export default function MyOrder({
 
   const form = useForm({
     defaultValues: {
-      status: selectedUser?.status,
+      status: "APPROVED" as "APPROVED" | "REJECT",
     },
     validators: {
       onSubmit: formSchema,
@@ -55,7 +56,7 @@ export default function MyOrder({
     onSubmit: async ({ value }) => {
       setLoading(true);
       try {
-        // const { data } = await updateMedicineAction(value, selectedUser?.id!);
+        const { data } = await updateOrderAction(value, selectedUser?.id!);
         toast.success("Update Status Succefully!", {
           position: "top-center",
         });
@@ -71,7 +72,7 @@ export default function MyOrder({
   return (
     <div>
       <h4 className="text-[24px] text-center mt-8 font-semibold mb-5">
-        My Medicine
+        My Order
       </h4>
 
       <Table>
@@ -118,16 +119,16 @@ export default function MyOrder({
 
               <TableCell className="flex gap-2">
                 <CiEdit
-                  className="size-6 cursor-pointer hover:text-green-500"
+                  className={cn(
+                    "size-6",
+                    item.status === "PENDING"
+                      ? "cursor-pointer hover:text-green-500"
+                      : "cursor-not-allowed text-gray-400",
+                  )}
                   onClick={() => {
+                    if (item.status !== "PENDING") return;
+
                     setSelectedUser(item);
-                    // form.reset({
-                    //   name: item.name,
-                    //   price: String(item.price),
-                    //   discount: String(item.discount),
-                    //   stock: item.stock,
-                    //   images: item.images,
-                    // });
                     setOpen(true);
                   }}
                 />
@@ -140,7 +141,7 @@ export default function MyOrder({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Medicine</DialogTitle>
+            <DialogTitle>Edit Order Status</DialogTitle>
           </DialogHeader>
 
           <form
@@ -159,23 +160,21 @@ export default function MyOrder({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field>
-                      <FieldLabel htmlFor={field.name}>
-                        Mecicine Name
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Status</FieldLabel>
                       <select
                         id={field.name}
                         name={field.name}
                         value={field.state.value}
                         onChange={(e) =>
                           field.handleChange(
-                            e.target.value as "PENDING" | "APPROVED" | "REJECT",
+                            e.target.value as "APPROVED" | "REJECT",
                           )
                         }
                         className="w-full rounded-md border px-3 py-2"
                       >
-                        <option value="">Select Category</option>
-                        <option value="ACTIVE">APPROVED</option>
-                        <option value="DEACTIVE">REJECT</option>
+                        <option value="">Select Status</option>
+                        <option value="APPROVED">APPROVED</option>
+                        <option value="REJECT">REJECT</option>
                       </select>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -194,7 +193,7 @@ export default function MyOrder({
             className="w-full"
           >
             {!loading ? (
-              "Update Medicine"
+              "Update Status"
             ) : (
               <span className="flex items-center gap-3">
                 <Spinner />

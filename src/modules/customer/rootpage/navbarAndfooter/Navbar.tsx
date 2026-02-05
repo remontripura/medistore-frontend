@@ -68,16 +68,16 @@ export default function Navbar() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="p-2">
+                <Button variant="outline" className="p-2 cursor-pointer">
                   <User className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem>
-                  <Link href="/login">Login</Link>
+                  <Link href="/profile">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Link href="/profile">Profile</Link>
+                  <Link href="/user/my-order">My Order</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href="/logout">Logout</Link>
