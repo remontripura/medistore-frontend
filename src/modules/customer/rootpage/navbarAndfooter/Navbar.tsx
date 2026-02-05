@@ -3,17 +3,20 @@
 import MainContainer from "@/components/shared/mainContainer/MainContainer";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useMedicineStore } from "@/store/addToCart.store";
 import { Menu, ShoppingCart, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Navbar() {
+  const medicine = useMedicineStore((state) => state.medicines);
+
   return (
     <header className="w-full bg-white shadow-md fixed top-0 left-0 z-50">
       <MainContainer>
@@ -54,8 +57,11 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Link href="/cart">
-              <Button variant="outline" className="p-2">
+            <Link href="/checkout">
+              <Button variant="outline" className="p-2 relative cursor-pointer">
+                <span className="bg-red-500 size-5 absolute -top-2 -right-2 text-white rounded-full">
+                  {medicine.length ? medicine.length : 0}
+                </span>
                 <ShoppingCart className="w-5 h-5" />
               </Button>
             </Link>

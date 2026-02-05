@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 type UserWithRole = {
-  role: "ADMIN" | "SELLER" | "USER";
+  role: "ADMIN" | "SELLER" | "CUSTOMER";
 };
 
 const formSchema = z.object({
@@ -47,7 +47,9 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
         const { data, error } = await authClient.signIn.email(value);
         if (data?.user && "role" in data.user) {
           const user = data.user as typeof data.user & UserWithRole;
-          if (user.role === "ADMIN" || "SELLER") {
+          if (user.role === "CUSTOMER") {
+            router.push("/");
+          } else if (user.role === "ADMIN" || "SELLER") {
             router.push("/dashboard");
           }
         }

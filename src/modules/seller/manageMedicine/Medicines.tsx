@@ -71,7 +71,6 @@ export default function Medicines({
   medicineData: Product[] | undefined;
 }) {
   const [open, setOpen] = useState(false);
-  const [confirmDialog, setConfirmDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Product | null>(null);
   const [loading, setLoading] = useState(false);
 

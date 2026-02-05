@@ -3,20 +3,29 @@
 import HeadingOne from "@/components/shared/heading/HeadingOne";
 import MainContainer from "@/components/shared/mainContainer/MainContainer";
 import { Button } from "@/components/ui/button";
+import { useMedicineStore } from "@/store/addToCart.store";
 import { MedicineDetails } from "@/types";
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface ShopDetailsProps {
   shopData: MedicineDetails | undefined;
+  userData: {
+    user: {
+      id: string;
+    };
+  };
 }
 
-export default function ShopDetails({ shopData }: ShopDetailsProps) {
+export default function ShopDetails({ shopData, userData }: ShopDetailsProps) {
   if (!shopData) {
     return null;
   }
+  const addMedicine = useMedicineStore((state) => state.addMedicine);
   const { price, discount, images, name, stock } = shopData || {};
   const [count, setCount] = useState(1);
   const discountedPrice = discount
@@ -30,7 +39,14 @@ export default function ShopDetails({ shopData }: ShopDetailsProps) {
   };
 
   const totalPrice = discountedPrice * count;
-
+  const router = useRouter();
+  const handleStoreData = (data: MedicineDetails) => {
+    if (userData === null) {
+      return router.push("/login");
+    }
+    toast.success("Add To Cart Successfully!", { position: "top-center" });
+    addMedicine({ ...data, count: count });
+  };
   return (
     <section className="pt-16">
       <MainContainer>
@@ -91,11 +107,17 @@ export default function ShopDetails({ shopData }: ShopDetailsProps) {
 
             <div className="flex flex-col md:flex-row gap-4 mt-4">
               <Link href="/checkout">
-                <Button className="w-full md:w-auto bg-primarylite hover:bg-primarylite/80 text-gray-950 cursor-pointer">
+                <Button
+                  onClick={() => handleStoreData(shopData)}
+                  className="w-full md:w-auto bg-primarylite hover:bg-primarylite/80 text-gray-950 cursor-pointer"
+                >
                   Buy Now
                 </Button>
               </Link>
-              <Button className="w-full md:w-auto border border-gray-300 text-gray-800 hover:bg-gray-300 bg-transparent cursor-pointer">
+              <Button
+                className="w-full md:w-auto border border-gray-300 text-gray-800 hover:bg-gray-300 bg-transparent cursor-pointer"
+                onClick={() => handleStoreData(shopData)}
+              >
                 Add to Cart
               </Button>
             </div>

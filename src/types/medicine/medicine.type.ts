@@ -34,6 +34,7 @@ export interface MedicineDetails {
   stock: number;
   avg_review: number;
   total_review: number;
+  count?: number;
   createdAt: string;
   updatedAt: string;
 }
