@@ -74,7 +74,13 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem>
-                  <Link href="/profile">Profile</Link>
+                  <Link href="/user/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/user/update-profile">Update Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/user/change-password">Change Passwored</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href="/user/my-order">My Order</Link>
