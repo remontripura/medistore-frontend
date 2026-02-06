@@ -53,6 +53,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
         if (data?.user && "role" in data.user) {
           const user = data.user as typeof data.user & UserWithRole;
           if (user.role === "CUSTOMER") {
+            router.refresh()
             router.push("/");
           } else if (user.role === "ADMIN" || "SELLER") {
             router.push("/dashboard");

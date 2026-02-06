@@ -1,3 +1,4 @@
+import Footer from "@/modules/customer/rootpage/navbarAndfooter/Footer";
 import RootNavbar from "@/modules/customer/rootpage/navbarAndfooter/Navbar";
 
 export default function CommonLayout({
@@ -8,7 +9,10 @@ export default function CommonLayout({
   return (
     <div>
       <RootNavbar />
-      {children}
+      <div className="md:pt-20 pt-16">
+        {children}
+      </div>
+      <Footer />
     </div>
   );
 }

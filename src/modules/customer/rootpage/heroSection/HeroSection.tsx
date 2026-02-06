@@ -6,7 +6,7 @@ import MainContainer from "@/components/shared/mainContainer/MainContainer";
 
 export default function HeroSection() {
   return (
-    <section className="relative bg-leniar-to-r from-green-50 to-white overflow-hidden md:h-175 h-auto md:pt-0 pt-20">
+    <section className="relative bg-leniar-to-r from-green-50 to-white overflow-hidden md:h-125 h-auto md:pt-0 pt-20">
       <MainContainer className="flex items-center justify-between w-full h-full">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8 lg:items-center">
           <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">

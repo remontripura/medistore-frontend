@@ -32,11 +32,8 @@ export const formSchema = z
       .refine((val) => !isNaN(Number(val)), {
         message: "Stock must be a number",
       }),
-    images: z
-      .string()
-      .url("Image must be a valid URL")
-      .min(1, "Image URL is required"),
 
+    images: z.instanceof(File).optional(),
     categoryId: z.string().min(1, "Category is required"),
     discount: z
       .string()
@@ -50,6 +47,8 @@ export const formSchema = z
     message: "Discount cannot be greater than price",
   });
 
+type FormValues = z.infer<typeof formSchema>;
+
 export function AddMedicineComponent({
   categoriesItem,
 }: {
@@ -61,10 +60,10 @@ export function AddMedicineComponent({
       name: "",
       price: "",
       stock: "",
-      images: "",
       categoryId: "",
       discount: "",
-    },
+      images: undefined,
+    } as FormValues,
 
     validators: {
       onSubmit: formSchema,
@@ -75,7 +74,7 @@ export function AddMedicineComponent({
         const { stock, ...rest } = value;
         const finalValue = { ...rest, stock: Number(stock) };
         const { data } = await addMedicineAction(finalValue);
-        toast.success("Add Category Succefully!", {
+        toast.success("Add Medicine Successfully!", {
           position: "top-center",
         });
         form.reset();
@@ -173,29 +172,6 @@ export function AddMedicineComponent({
               />
 
               <form.Field
-                name="images"
-                children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid;
-                  return (
-                    <Field>
-                      <FieldLabel htmlFor={field.name}>Image URL</FieldLabel>
-                      <Input
-                        type="url"
-                        id={field.name}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="https://example.com/image.jpg"
-                      />
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
-                    </Field>
-                  );
-                }}
-              />
-
-              <form.Field
                 name="categoryId"
                 children={(field) => {
                   const isInvalid =
@@ -238,6 +214,31 @@ export function AddMedicineComponent({
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         placeholder="Enter discount amount"
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+              <form.Field
+                name="images"
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>Image URL</FieldLabel>
+                      <Input
+                        type="file"
+                        id={field.name}
+                        name={field.name}
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          field.handleChange(file);
+                        }}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

@@ -74,28 +74,39 @@ export const medicineServices = {
   addMedicine: async (medicineData: Medicine) => {
     try {
       const cookieStore = await cookies();
-
+      const formData = new FormData();
+      if (medicineData.name) formData.append("name", medicineData.name);
+      if (medicineData.price) formData.append("price", medicineData.price);
+      if (medicineData.stock !== undefined)
+        formData.append("stock", String(medicineData.stock));
+      if (medicineData.categoryId)
+        formData.append("categoryId", medicineData.categoryId);
+      if (medicineData.discount)
+        formData.append("discount", medicineData.discount);
+      if (medicineData.images) formData.append("images", medicineData.images);
       const res = await fetch(`${API_URL}/medicine`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Cookie: cookieStore.toString(),
         },
-        body: JSON.stringify(medicineData),
+        body: formData,
       });
       const data = await res.json();
-      if (data.error) {
+      if (!res.ok) {
         return {
           data: null,
-          error: { message: "Medicine Add Succefully." },
+          error: { message: data.message || "Medicine add failed" },
         };
       }
-
-      return { data: data, error: null };
+      return { data, error: null };
     } catch (err) {
-      return { data: null, error: { message: "Something Went Wrong" } };
+      return {
+        data: null,
+        error: { message: "Something went wrong" },
+      };
     }
   },
+
   updateMedicine: async (medicineData: updateMedicine, medicineId: string) => {
     try {
       const cookieStore = await cookies();

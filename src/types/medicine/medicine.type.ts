@@ -1,10 +1,10 @@
 export interface Medicine {
-  name: string;
-  price: string;
-  stock: number;
-  images: string;
-  categoryId: string;
-  discount: string;
+  name: string | undefined;
+  price: string | undefined;
+  stock: number | undefined;
+  images?: File | undefined;
+  categoryId: string | undefined;
+  discount: string | undefined;
 }
 
 export interface Product {

@@ -1,8 +1,41 @@
 import ShopDetails from "@/modules/customer/shop/ShopDetails";
 import { medicineServices } from "@/services/medicine.service";
 import { userService } from "@/services/user.service";
+import { Metadata } from "next";
 
-export default async function ShopPage({
+interface PageProps {
+  params: { id: string };
+  searchParams: Promise<{ page?: string }>;
+}
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const { data: medicineData } = await medicineServices.getMedicineById(id);
+  const medicine = medicineData?.data.name;
+  const seoTitle = medicine;
+  const seoDescription = medicine;
+  const seoKeywords = medicine;
+  return {
+    title: seoTitle,
+    description: seoDescription,
+    keywords: seoKeywords,
+    openGraph: {
+      title: seoTitle,
+      description: seoDescription,
+      images: [
+        {
+          url: medicineData?.data.images ?? "",
+          width: 1200,
+          height: 630,
+          alt: medicine,
+        },
+      ],
+      type: "website",
+    },
+  };
+}
+export default async function SingleShopPage({
   params,
 }: {
   params: Promise<{ id: string }>;

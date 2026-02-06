@@ -1,5 +1,6 @@
 "use client";
 
+import { getSession } from "@/actions/users.action";
 import MainContainer from "@/components/shared/mainContainer/MainContainer";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,13 +10,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { authClient } from "@/lib/auth-client";
 import { useMedicineStore } from "@/store/addToCart.store";
 import { Menu, ShoppingCart, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function Navbar() {
   const medicine = useMedicineStore((state) => state.medicines);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await getSession();
+      setUser(data?.user);
+    };
+    fetchUser();
+  }, []);
+  const router = useRouter();
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Log Out");
+          router.push("/");
+          router.refresh()
+        },
+      },
+    });
+  };
 
   return (
     <header className="w-full bg-white shadow-md fixed top-0 left-0 z-50">
@@ -66,30 +92,38 @@ export default function Navbar() {
               </Button>
             </Link>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            {!user ? (
+              <Link href="/login">
                 <Button variant="outline" className="p-2 cursor-pointer">
-                  <User className="w-5 h-5" />
+                  Login
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem>
-                  <Link href="/user/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/user/update-profile">Update Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/user/change-password">Change Passwored</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/user/my-order">My Order</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/logout">Logout</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </Link>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="p-2 cursor-pointer">
+                    <User className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem>
+                    <Link href="/user/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/user/update-profile">Update Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/user/change-password">Change Passwored</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/user/my-order">My Order</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <span onClick={handleLogout}>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </nav>
       </MainContainer>

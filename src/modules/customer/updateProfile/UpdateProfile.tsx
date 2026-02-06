@@ -3,18 +3,18 @@
 import { updateUser } from "@/actions/users.action";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
-    Field,
-    FieldError,
-    FieldGroup,
-    FieldLabel,
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -31,13 +31,11 @@ export type AppUser = BetterAuthUser & {
 };
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name Is Required"),
-  phone: z.string().min(1, "Name Is Required"),
-  image: z
-    .string()
-    .url("Image must be a valid URL")
-    .min(1, "Image URL is required"),
+  name: z.string(),
+  phone: z.string(),
+  image: z.instanceof(File).optional(),
 });
+type FormValues = z.infer<typeof formSchema>;
 
 export function UpdateProfileComponent({
   user,
@@ -50,16 +48,17 @@ export function UpdateProfileComponent({
     defaultValues: {
       name: user?.name ?? "",
       phone: user?.phone ?? "",
-      image: user?.image ?? "",
-    },
+      image: undefined,
+    } as FormValues,
+
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
       setLoading(true);
       try {
-        const { data } = await updateUser(value);
-        console.log(data);
+        const res = await updateUser(value);
+        console.log(res);
         setLoading(false);
         toast.success("User Logged in Successfully");
       } catch (err) {
@@ -140,12 +139,14 @@ export function UpdateProfileComponent({
                     <Field>
                       <FieldLabel htmlFor={field.name}>Images</FieldLabel>
                       <Input
-                        type="url"
+                        type="file"
                         id={field.name}
                         name={field.name}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="Images Url"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          field.handleChange(file);
+                        }}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

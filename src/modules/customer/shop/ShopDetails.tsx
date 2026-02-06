@@ -48,7 +48,7 @@ export default function ShopDetails({ shopData, userData }: ShopDetailsProps) {
     addMedicine({ ...data, count: count });
   };
   return (
-    <section className="pt-16">
+    <section className="pt-16 py-8">
       <MainContainer>
         <div className="grid md:grid-cols-2 grid-cols-1 gap-6 items-center">
           <div className="w-full h-full border border-gray-300 rounded-lg overflow-hidden">

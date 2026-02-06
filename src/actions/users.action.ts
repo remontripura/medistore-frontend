@@ -18,3 +18,7 @@ export const updateUser = async (userStatus: UserData) => {
   updateTag("user");
   return res;
 };
+export const getSession = async () => {
+  const res = await userService.getSession();
+  return res;
+};

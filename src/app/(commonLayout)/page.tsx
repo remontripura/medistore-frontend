@@ -1,4 +1,6 @@
+import Banner from "@/modules/customer/rootpage/banner/Banner";
 import CategorySection from "@/modules/customer/rootpage/categorySection/CategorySection";
+import FaqSection from "@/modules/customer/rootpage/faq/FaqSection";
 import HeroSection from "@/modules/customer/rootpage/heroSection/HeroSection";
 import Products from "@/modules/customer/rootpage/products/Products";
 import { categoriesServices } from "@/services/categories.services";
@@ -14,6 +16,8 @@ export default async function Home() {
       <HeroSection />
       <CategorySection category={category?.data} />
       <Products productData={data?.data} />
+      <Banner />
+      <FaqSection />
     </div>
   );
 }

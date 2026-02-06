@@ -21,7 +21,6 @@ export default async function MyOrderPage({
     total: 0,
     totalPages: 1,
   };
-  console.log(data);
   return (
     <section className="md:pt-20 pt-12">
       {data?.data.length === 0 ? (
