@@ -1,3 +1,4 @@
+
 import HeadingOne from "@/components/shared/heading/HeadingOne";
 import MainContainer from "@/components/shared/mainContainer/MainContainer";
 import { UpdateProfileComponent } from "@/modules/customer/updateProfile/UpdateProfile";

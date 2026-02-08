@@ -16,8 +16,10 @@ export default async function DashboardLayout({
   seller: React.ReactNode;
 }) {
   const { data } = await userService.getSession();
-
-  const userInfo = data.user;
+  if (!data) {
+    return null;
+  }
+  const userInfo = data?.user;
   return (
     <SidebarProvider>
       <AppSidebar user={userInfo} />

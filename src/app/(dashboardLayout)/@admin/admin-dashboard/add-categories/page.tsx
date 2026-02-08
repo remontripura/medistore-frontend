@@ -14,7 +14,12 @@ export default async function AddCAtegories({
   searchParams: Promise<{ page: string }>;
 }) {
   const { page } = await searchParams;
-  const { data } = await categoriesServices.getCategoris({ page });
+  const { data } = await categoriesServices.getCategoris(
+    { page },
+    {
+      revalidate: 60,
+    },
+  );
   const pagination = data?.pagination || {
     limit: 10,
     page: 1,

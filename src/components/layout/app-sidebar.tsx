@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 
 import {
@@ -17,6 +18,9 @@ import { Route } from "@/types";
 import { Roles } from "@/constants/roles";
 import { adminRoutes } from "../routes/adminRoutes";
 import { sellerRoutes } from "../routes/sellerRoutes";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function AppSidebar({
   user,
@@ -37,6 +41,18 @@ export function AppSidebar({
       routes = [];
       break;
   }
+  const router = useRouter();
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Log Out");
+          router.push("/");
+          router.refresh();
+        },
+      },
+    });
+  };
 
   return (
     <Sidebar {...props}>
@@ -48,11 +64,22 @@ export function AppSidebar({
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton
+                      asChild
+                      className="hover:bg-gray-300 cursor-pointer"
+                    >
                       <Link href={item.url}>{item.title}</Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    onClick={handleLogout}
+                    className="hover:bg-gray-300 cursor-pointer"
+                  >
+                    <span>Logout</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

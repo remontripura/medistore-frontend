@@ -19,8 +19,8 @@ export interface Product {
     name: string;
     slug: string;
   };
-  avg_ratings: number;
-  total_reviews: number;
+  avg_review: number;
+  total_review: number;
   createdAt: string;
   updatedAt: string;
 }

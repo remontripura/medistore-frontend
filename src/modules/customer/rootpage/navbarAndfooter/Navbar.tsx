@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Roles } from "@/constants/roles";
 import { authClient } from "@/lib/auth-client";
 import { useMedicineStore } from "@/store/addToCart.store";
 import { Menu, ShoppingCart, User } from "lucide-react";
@@ -19,14 +20,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+type UserWithRole = {
+  role: "ADMIN" | "SELLER" | "CUSTOMER";
+};
+
 export default function Navbar() {
   const medicine = useMedicineStore((state) => state.medicines);
   const [user, setUser] = useState(null);
-
+  const userRole = user as typeof user & UserWithRole;
+  console.log(userRole);
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await getSession();
-      setUser(data?.user);
+      setUser(data?.user?.role);
     };
     fetchUser();
   }, []);
@@ -37,7 +43,7 @@ export default function Navbar() {
         onSuccess: () => {
           toast.success("Log Out");
           router.push("/");
-          router.refresh()
+          router.refresh();
         },
       },
     });
@@ -58,8 +64,6 @@ export default function Navbar() {
                 <div className="flex flex-col space-y-6 text-gray-800 font-medium text-lg">
                   <Link href="/">Home</Link>
                   <Link href="/shop">Shop</Link>
-                  <Link href="/about">About</Link>
-                  <Link href="/contact">Contact</Link>
                 </div>
               </SheetContent>
             </Sheet>
@@ -78,8 +82,6 @@ export default function Navbar() {
           <div className="hidden md:flex space-x-8 text-gray-700 font-medium">
             <Link href="/">Home</Link>
             <Link href="/shop">Shop</Link>
-            <Link href="/about">About</Link>
-            <Link href="/contact">Contact</Link>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -93,6 +95,50 @@ export default function Navbar() {
             </Link>
 
             {!user ? (
+              <Link href="/dashboard">
+                <Button variant="outline" className="p-2 cursor-pointer">
+                  Login
+                </Button>
+              </Link>
+            ) : userRole === Roles.admin || userRole === Roles.seller ? (
+              <Link href="/dashboard">
+                <Button variant="outline" className="p-2 cursor-pointer">
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="p-2 cursor-pointer">
+                    <User className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/profile">Profile</Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/update-profile">Update Profile</Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/change-password">Change Password</Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link href="/user/my-order">My Order</Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* {!user.roles === Roles.admin ? (
               <Link href="/login">
                 <Button variant="outline" className="p-2 cursor-pointer">
                   Login
@@ -123,7 +169,7 @@ export default function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            )}
+            )} */}
           </div>
         </nav>
       </MainContainer>

@@ -1,3 +1,6 @@
+"use client";
+
+import { getSession } from "@/actions/users.action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,30 +9,49 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Product } from "@/types";
+import { useMedicineStore } from "@/store/addToCart.store";
+import { MedicineDetails, Product } from "@/types";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: Product | undefined }) {
-  const {
-    id,
-    images,
-    name,
-    price,
-    avg_ratings,
-    discount,
-    stock,
-    total_reviews,
-  } = product || {};
+  const { id, images, name, price, avg_review, discount, stock, total_review } =
+    product || {};
   const discountedPrice = discount
     ? Math.round(Number(price) - (Number(price) * Number(discount)) / 100)
     : price;
+  const router = useRouter();
+  const addMedicine = useMedicineStore((state) => state.addMedicine);
+
+  const handleStoreData = async (data: MedicineDetails | undefined) => {
+    if (!data) return;
+    const { data: userData } = await getSession();
+    if (userData === null) {
+      return router.push("/login");
+    }
+    const storeData: MedicineDetails & { count: number } = {
+      id: data.id,
+      images: data.images,
+      name: data.name,
+      price: data.price,
+      discount: data.discount,
+      stock: data.stock,
+      avg_review: data.avg_review,
+      total_review: data.total_review,
+      count: 1,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
+    addMedicine(storeData);
+    toast.success("Add To Cart Successfully!", { position: "top-center" });
+  };
 
   return (
-    <Link href={`/shop/${id}`}>
-      <Card className="group p-1 cursor-pointer w-full max-w-sm overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-lg gap-2">
+    <Card className="group p-1 cursor-pointer w-full max-w-sm overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-lg gap-2">
+      <Link href={`/shop/${id}`}>
         <div className="relative h-auto w-full">
           <div className="w-full overflow-hidden  rounded-lg">
             {images && (
@@ -38,7 +60,7 @@ export function ProductCard({ product }: { product: Product | undefined }) {
                 alt="img"
                 width={500}
                 height={500}
-                className="object-cover transition-transform duration-300 group-hover:scale-105 w-full h-32 rounded-lg"
+                className="object-cover transition-transform duration-300 group-hover:scale-105 w-full h-40 rounded-lg"
               />
             )}
           </div>
@@ -54,9 +76,9 @@ export function ProductCard({ product }: { product: Product | undefined }) {
         <CardContent className="space-y-3 px-2">
           <div className="flex items-center gap-1 text-sm">
             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="font-medium">{avg_ratings || 0}</span>
+            <span className="font-medium">{avg_review || 0}</span>
             <span className="text-muted-foreground">
-              ({total_reviews || 0} reviews)
+              ({total_review || 0} reviews)
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -77,12 +99,21 @@ export function ProductCard({ product }: { product: Product | undefined }) {
             {Number(stock) > 0 ? "In Stock" : "Out of Stock"}
           </p>
         </CardContent>
-        <CardFooter className="px-2 ">
-          <Button disabled={stock === 0} className="w-full rounded-lg">
-            Add to Cart
-          </Button>
-        </CardFooter>
-      </Card>
-    </Link>
+      </Link>
+      <CardFooter className="px-2 ">
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            e.stopPropagation();
+            if (product) handleStoreData(product);
+          }}
+          disabled={stock === 0}
+          className="w-full rounded-full hover:text-white bg-gray-50 border border-gray-300 text-gray-800 cursor-pointer"
+        >
+          Add to Cart
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
