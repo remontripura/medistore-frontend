@@ -74,22 +74,13 @@ export const medicineServices = {
   addMedicine: async (medicineData: Medicine) => {
     try {
       const cookieStore = await cookies();
-      const formData = new FormData();
-      if (medicineData.name) formData.append("name", medicineData.name);
-      if (medicineData.price) formData.append("price", medicineData.price);
-      if (medicineData.stock !== undefined)
-        formData.append("stock", String(medicineData.stock));
-      if (medicineData.categoryId)
-        formData.append("categoryId", medicineData.categoryId);
-      if (medicineData.discount)
-        formData.append("discount", medicineData.discount);
-      if (medicineData.images) formData.append("images", medicineData.images);
       const res = await fetch(`${API_URL}/medicine`, {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Cookie: cookieStore.toString(),
         },
-        body: formData,
+        body: JSON.stringify(medicineData),
       });
       const data = await res.json();
       if (!res.ok) {

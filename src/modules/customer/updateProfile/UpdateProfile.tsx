@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { uploadToImgbb } from "@/utils/imageBBUpload";
 import { useForm } from "@tanstack/react-form";
 import type { User as BetterAuthUser } from "better-auth";
 import { useState } from "react";
@@ -33,7 +34,7 @@ export type AppUser = BetterAuthUser & {
 const formSchema = z.object({
   name: z.string(),
   phone: z.string(),
-  image: z.instanceof(File).optional(),
+  image: z.instanceof(File).nullable().optional(),
 });
 type FormValues = z.infer<typeof formSchema>;
 
@@ -57,10 +58,15 @@ export function UpdateProfileComponent({
     onSubmit: async ({ value }) => {
       setLoading(true);
       try {
-        const res = await updateUser(value);
-        console.log(res);
+        let imageUrl = user?.image;
+
+        if (value.image instanceof File) {
+          imageUrl = await uploadToImgbb(value.image);
+        }
+        const { data } = await updateUser({ ...value, image: imageUrl });
+        console.log("update profile data", data);
         setLoading(false);
-        toast.success("User Logged in Successfully");
+        toast.success("User Updated Successfully");
       } catch (err) {
         toast.error("Something went wrong, please try again.");
         setLoading(false);
@@ -137,7 +143,7 @@ export function UpdateProfileComponent({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field>
-                      <FieldLabel htmlFor={field.name}>Images</FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Image URL</FieldLabel>
                       <Input
                         type="file"
                         id={field.name}

@@ -2,6 +2,7 @@
 
 import { updateMedicineAction } from "@/actions/medicineAction";
 import { formatDate } from "@/components/shared/DateFormate/DateFormate";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,8 +26,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { medicineServices } from "@/services/medicine.service";
 import { Product } from "@/types";
+import { uploadToImgbb } from "@/utils/imageBBUpload";
 import { useForm } from "@tanstack/react-form";
 import Image from "next/image";
 import { useState } from "react";
@@ -35,7 +36,6 @@ import { MdDeleteSweep } from "react-icons/md";
 import { toast } from "sonner";
 import * as z from "zod";
 import { DeleteMedicineDialog } from "./DeleteMedicineDialog";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const formSchema = z
   .object({
@@ -50,10 +50,7 @@ const formSchema = z
       .string()
       .refine((v) => !isNaN(Number(v)), "Discount must be a number"),
     stock: z.number().min(1, "Stock cannot be negative"),
-    images: z
-      .string()
-      .url("Image must be a valid URL")
-      .min(1, "Image URL is required"),
+    images: z.instanceof(File).nullable().optional(),
   })
   .superRefine((data, ctx) => {
     if (Number(data.discount) > Number(data.price)) {
@@ -64,6 +61,7 @@ const formSchema = z
       });
     }
   });
+type FormValues = z.infer<typeof formSchema>;
 
 export default function Medicines({
   medicineData,
@@ -80,15 +78,24 @@ export default function Medicines({
       price: selectedUser?.price,
       discount: selectedUser?.discount,
       stock: selectedUser?.stock ?? 0,
-      images: selectedUser?.images,
-    },
+      images: undefined,
+    } as FormValues,
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
       setLoading(true);
       try {
-        const { data } = await updateMedicineAction(value, selectedUser?.id!);
+        let imageUrl = selectedUser?.images;
+
+        if (value.images instanceof File) {
+          imageUrl = await uploadToImgbb(value.images);
+        }
+
+        const { data } = await updateMedicineAction(
+          { ...value, images: imageUrl as string },
+          selectedUser?.id!,
+        );
         toast.success("Update Status Succefully!", {
           position: "top-center",
         });
@@ -151,7 +158,7 @@ export default function Medicines({
                       price: String(item.price),
                       discount: String(item.discount),
                       stock: item.stock,
-                      images: item.images,
+                      images: undefined,
                     });
                     setOpen(true);
                   }}
@@ -287,13 +294,16 @@ export default function Medicines({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field>
-                      <FieldLabel htmlFor={field.name}>Images</FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Image URL</FieldLabel>
                       <Input
-                        type="text"
+                        type="file"
                         id={field.name}
                         name={field.name}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          field.handleChange(file);
+                        }}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

@@ -12,6 +12,7 @@ export const env = createEnv({
   //   Client Example
   client: {
     NEXT_PUBLIC_TEST: z.string(),
+    NEXT_PUBLIC_IMGBB_API_KEY: z.string().min(1),
   },
 
   runtimeEnv: {
@@ -20,5 +21,6 @@ export const env = createEnv({
     API_URL: process.env.API_URL,
     AUTH_URL: process.env.AUTH_URL,
     NEXT_PUBLIC_TEST: process.env.NEXT_PUBLIC_TEST,
+    NEXT_PUBLIC_IMGBB_API_KEY: process.env.NEXT_PUBLIC_IMGBB_KEY,
   },
 });

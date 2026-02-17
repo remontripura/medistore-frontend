@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { CategoryType } from "@/types";
+import { uploadToImgbb } from "@/utils/imageBBUpload";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -71,8 +72,9 @@ export function AddMedicineComponent({
     onSubmit: async ({ value }) => {
       setLoading(true);
       try {
+        const imageUrl = await uploadToImgbb(value.images!);
         const { stock, ...rest } = value;
-        const finalValue = { ...rest, stock: Number(stock) };
+        const finalValue = { ...rest, stock: Number(stock), images: imageUrl };
         const { data } = await addMedicineAction(finalValue);
         toast.success("Add Medicine Successfully!", {
           position: "top-center",

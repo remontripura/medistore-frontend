@@ -6,7 +6,7 @@ const API_URL = env.API_URL;
 export interface UserData {
   name?: string | undefined;
   phone?: string | undefined;
-  image?: File | undefined;
+  image?: string | null | undefined;
 }
 
 export const userService = {
@@ -29,25 +29,15 @@ export const userService = {
     }
   },
   updateUser: async (userData: UserData) => {
-    const formData = new FormData();
-    if (userData.name) {
-      formData.append("name", userData.name);
-    }
-    if (userData.phone) {
-      formData.append("phone", userData.phone);
-    }
-    if (userData.image) {
-      formData.append("image", userData.image);
-    }
     try {
       const cookieStore = await cookies();
       const res = await fetch(`${API_URL}/user`, {
         method: "PATCH",
         headers: {
-          // "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
           Cookie: cookieStore.toString(),
         },
-        body: formData,
+        body: JSON.stringify(userData),
       });
       const data = await res.json();
       if (data.error) {

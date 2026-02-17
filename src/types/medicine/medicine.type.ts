@@ -44,5 +44,5 @@ export interface updateMedicine {
   price: string | undefined;
   discount: string | undefined;
   stock: string | number;
-  images: string | undefined;
+  images?: string | undefined;
 }
