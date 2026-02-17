@@ -7,7 +7,6 @@ export const metadata: Metadata = {
 };
 export default async function MyOrderPage() {
   const { data } = await orderServices.getMyOrder();
-  console.log(data);
   return (
     <>
       {" "}

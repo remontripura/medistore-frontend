@@ -1,14 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
+import { createReview } from "@/actions/review.action";
+import MainContainer from "@/components/shared/mainContainer/MainContainer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import { MedicineDetails, Review } from "@/types";
+import { useForm } from "@tanstack/react-form";
 import { motion } from "framer-motion";
+import { Star } from "lucide-react";
+import { useState } from "react";
+import { FaUser } from "react-icons/fa";
+import { toast } from "sonner";
+import z from "zod";
+
+interface ReviewsProps {
+  shopData: MedicineDetails | undefined;
+  itemId: string;
+  reviews: Review[];
+}
+
+const formSchema = z
+  .object({
+    title: z.string().min(3, "Title must be at least 3 characters"),
+    description: z
+      .string()
+      .min(10, "Description must be at least 10 characters"),
+  })
+  .required();
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface ReviewType {
   id: number;
@@ -17,128 +47,109 @@ interface ReviewType {
   rating: number;
 }
 
-export default function ReviewPage() {
-  const [reviews, setReviews] = useState<ReviewType[]>([
-    {
-      id: 1,
-      title: "Excellent Service",
-      description:
-        "The experience was smooth and professional. Highly recommended!",
-      rating: 5,
-    },
-    {
-      id: 2,
-      title: "Very Good Support",
-      description:
-        "Support team was responsive and helpful throughout the process.",
-      rating: 4,
-    },
-  ]);
+export default function ReviewPageComponent({
+  shopData,
+  reviews,
+  itemId,
+}: ReviewsProps) {
+  const [loading, setLoading] = useState(false);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [rating, setRating] = useState(0);
 
   const totalReviews = reviews.length;
   const averageRating =
     totalReviews > 0
       ? (
-          reviews.reduce((acc, review) => acc + review.rating, 0) /
-          totalReviews
+          reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews
         ).toFixed(1)
       : "0";
 
-  const handleSubmit = () => {
-    if (!title || !description || rating === 0) return;
+  const form = useForm({
+    defaultValues: {
+      title: "",
+      description: "",
+    } as FormValues,
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      setLoading(true);
 
-    const newReview: ReviewType = {
-      id: Date.now(),
-      title,
-      description,
-      rating,
-    };
+      try {
+        if (rating === 0) {
+          setLoading(false);
+          return toast.error(
+            "Please provide a rating before submitting your review.",
+            {
+              position: "top-center",
+            },
+          );
+        }
+        const { data } = await createReview(
+          { ...value, ratings: rating },
+          itemId,
+        );
+        if (data.success === false) {
+          toast.error(data?.details || "Error: Review not created.", {
+            position: "top-center",
+          });
+        } else {
+          toast.success("Review submitted successfully!", {
+            position: "top-center",
+          });
+          form.reset();
+        }
 
-    setReviews([newReview, ...reviews]);
-    setTitle("");
-    setDescription("");
-    setRating(0);
-  };
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+      }
+    },
+  });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-6">
-      <div className="max-w-6xl mx-auto space-y-10">
-        {/* Header */}
+    <div className="h-auto py-6">
+      <MainContainer className="space-y-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="text-center space-y-3"
         >
-          <h1 className="text-4xl font-bold tracking-tight">
-            Customer Reviews
-          </h1>
-          <p className="text-slate-400 text-lg">
+          <h1 className="text-4xl font-bold tracking-tight">Reviews</h1>
+          <p className="text-slate-800 text-lg">
             See what our customers are saying about us
           </p>
         </motion.div>
-
-        {/* Stats Section */}
-        <Card className="bg-slate-900/70 border border-slate-800 shadow-2xl rounded-2xl">
-          <CardContent className="p-8 grid md:grid-cols-3 gap-8 items-center">
-            <div className="text-center space-y-2">
-              <p className="text-5xl font-bold">{averageRating}</p>
-              <div className="flex justify-center gap-1">
+        <Card className="rounded-2xl">
+          <CardContent className="p-3 flex gap-10 items-center">
+            <div className="flex flex-col items-center md:items-start space-y-3">
+              <div className="text-6xl font-bold leading-none">
+                {shopData?.avg_review ? shopData.avg_review.toFixed(1) : "0"}
+              </div>
+              <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`w-5 h-5 ${
-                      star <= Math.round(Number(averageRating))
+                    className={`w-6 h-6 ${
+                      star <= Math.round(Number(shopData?.avg_review || 0))
                         ? "fill-yellow-400 text-yellow-400"
                         : "text-slate-600"
                     }`}
                   />
                 ))}
               </div>
-              <p className="text-slate-400">Average Rating</p>
-            </div>
-
-            <div className="text-center space-y-2">
-              <p className="text-5xl font-bold">{totalReviews}</p>
-              <p className="text-slate-400">Total Reviews</p>
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-slate-400">Overall Satisfaction</p>
-              <Progress
-                value={(Number(averageRating) / 5) * 100}
-                className="h-3"
-              />
-              <p className="text-sm text-slate-500">
-                {((Number(averageRating) / 5) * 100).toFixed(0)}% Positive
-              </p>
+              <p className="text-slate-400 text-sm">{totalReviews} reviews</p>
             </div>
           </CardContent>
         </Card>
 
         {/* Review Form */}
-        <Card className="bg-slate-900/70 border border-slate-800 shadow-xl rounded-2xl">
+        <Card className="shadow-xl rounded-2xl">
           <CardHeader>
             <CardTitle className="text-2xl">Write a Review</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <Input
-              placeholder="Review Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="bg-slate-800 border-slate-700"
-            />
-            <Textarea
-              placeholder="Write your experience..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="bg-slate-800 border-slate-700 min-h-[120px]"
-            />
-
             <div className="flex items-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -152,12 +163,78 @@ export default function ReviewPage() {
                 />
               ))}
             </div>
+            <form
+              id="review-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit();
+              }}
+              className="space-y-3"
+            >
+              <FieldGroup>
+                <form.Field
+                  name="title"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field>
+                        <FieldLabel htmlFor={field.name}>Title</FieldLabel>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="w-full rounded-md border px-3 py-2"
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    );
+                  }}
+                />
+                <form.Field
+                  name="description"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid;
+                    return (
+                      <Field>
+                        <FieldLabel htmlFor={field.name}>
+                          Description
+                        </FieldLabel>
+                        <Textarea
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="h-28"
+                        />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    );
+                  }}
+                />
+              </FieldGroup>
+            </form>
 
             <Button
-              onClick={handleSubmit}
-              className="w-full rounded-2xl text-lg font-semibold"
+              disabled={loading}
+              form="review-form"
+              type="submit"
+              className="w-full md:w-fit py-4 cursor-pointer"
             >
-              Submit Review
+              {!loading ? (
+                "Submit Review"
+              ) : (
+                <span className="flex items-center gap-3">
+                  <Spinner />
+                  Processing
+                </span>
+              )}
             </Button>
           </CardContent>
         </Card>
@@ -171,23 +248,26 @@ export default function ReviewPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <Card className="bg-slate-900/70 border border-slate-800 rounded-2xl shadow-lg h-full">
+              <Card className=" border border-slate-300 rounded-2xl shadow-lg h-full">
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center gap-4">
                     <Avatar>
-                      <AvatarImage src="https://i.pravatar.cc/100" />
-                      <AvatarFallback>U</AvatarFallback>
+                      <AvatarImage
+                        className="object-cover"
+                        src={review.user?.image || ""}
+                      />
+                      <AvatarFallback>
+                        <FaUser />
+                      </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-semibold text-lg">
-                        {review.title}
-                      </h3>
+                      <h3 className="font-semibold text-lg">{review.title}</h3>
                       <div className="flex gap-1 mt-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
                             key={star}
                             className={`w-4 h-4 ${
-                              star <= review.rating
+                              star <= review.ratings
                                 ? "fill-yellow-400 text-yellow-400"
                                 : "text-slate-600"
                             }`}
@@ -204,7 +284,7 @@ export default function ReviewPage() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </MainContainer>
     </div>
   );
 }

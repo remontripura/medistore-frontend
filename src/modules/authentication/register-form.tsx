@@ -56,7 +56,6 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
         const { data, error } = await authClient.signUp.email(payload);
         if (data) {
           toast.success("User Register Successfully");
-          console.log(data);
           form.reset();
           router.push("/");
           setLoading(false);

@@ -64,7 +64,6 @@ export function UpdateProfileComponent({
           imageUrl = await uploadToImgbb(value.image);
         }
         const { data } = await updateUser({ ...value, image: imageUrl });
-        console.log("update profile data", data);
         setLoading(false);
         toast.success("User Updated Successfully");
       } catch (err) {

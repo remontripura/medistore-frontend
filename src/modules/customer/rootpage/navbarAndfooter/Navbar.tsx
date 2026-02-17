@@ -28,7 +28,6 @@ export default function Navbar() {
   const medicine = useMedicineStore((state) => state.medicines);
   const [user, setUser] = useState(null);
   const userRole = user as typeof user & UserWithRole;
-  console.log(userRole);
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await getSession();

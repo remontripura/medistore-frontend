@@ -12,7 +12,6 @@ export const metadata: Metadata = {
 export default async function ProfilePage() {
   const { data } = await userService.getSession();
   const user = data?.user;
-  console.log(user);
   return (
     <section className="flex justify-center items-center min-h-[80vh] px-4">
       <Card className="w-full max-w-md shadow-lg rounded-2xl">
