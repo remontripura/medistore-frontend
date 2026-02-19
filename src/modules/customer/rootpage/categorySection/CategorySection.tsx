@@ -18,7 +18,7 @@ export default function CategorySection({
       <HeadingOne text="Categories" className="text-center" />
       <MainContainer className="grid md:grid-cols-6 grid-cols-2 md:gap-5 gap-3 mt-5">
         {displayCategories.map((item) => (
-          <Link href={`/category/${item.slug}`} key={item.id}>
+          <Link href={`/category/${item.id}`} key={item.id}>
             <div
               className={cn(
                 "bg-blue-400 cursor-pointer text-center rounded-lg py-4 text-gray-800 text-[24px]",

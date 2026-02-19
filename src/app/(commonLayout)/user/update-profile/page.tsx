@@ -18,7 +18,7 @@ export default async function UpdateProfile() {
       <MainContainer>
         <HeadingOne text="Update Profile" className="text-center" />
         <div>
-          <UpdateProfileComponent user={data.user} />
+          <UpdateProfileComponent user={data?.user} />
         </div>
       </MainContainer>
     </section>

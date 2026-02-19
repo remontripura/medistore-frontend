@@ -1,3 +1,4 @@
+import HeadingOne from "@/components/shared/heading/HeadingOne";
 import MainContainer from "@/components/shared/mainContainer/MainContainer";
 import { ChangePassword } from "@/modules/customer/changePassword/ChangePassword";
 import { Metadata } from "next";
@@ -8,8 +9,9 @@ export const metadata: Metadata = {
 };
 export default async function ChangePasswordPage() {
   return (
-    <section className="md:pt-20 pt-12">
+    <section className="min-h-dvh">
       <MainContainer>
+        <HeadingOne text="Changes your password" className="text-center"/>
         <ChangePassword />
       </MainContainer>
     </section>

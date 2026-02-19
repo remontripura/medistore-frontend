@@ -40,12 +40,6 @@ const formSchema = z
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface ReviewType {
-  id: number;
-  title: string;
-  description: string;
-  rating: number;
-}
 
 export default function ReviewPageComponent({
   shopData,
@@ -53,17 +47,8 @@ export default function ReviewPageComponent({
   itemId,
 }: ReviewsProps) {
   const [loading, setLoading] = useState(false);
-
   const [rating, setRating] = useState(0);
-
   const totalReviews = reviews.length;
-  const averageRating =
-    totalReviews > 0
-      ? (
-          reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews
-        ).toFixed(1)
-      : "0";
-
   const form = useForm({
     defaultValues: {
       title: "",

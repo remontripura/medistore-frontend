@@ -4,6 +4,16 @@ import { medicineServices } from "@/services/medicine.service";
 import { Medicine, updateMedicine } from "@/types";
 import { updateTag } from "next/cache";
 
+export const getMedicineAction = async () => {
+  const res = await medicineServices.getMedicine();
+  updateTag("medicine");
+  return res;
+};
+export const searchMedicineAction = async (value: string) => {
+  const res = await medicineServices.searchMedicine(value, undefined);
+  updateTag("medicine");
+  return res;
+};
 export const addMedicineAction = async (data: Medicine) => {
   const res = await medicineServices.addMedicine(data);
   updateTag("medicine");

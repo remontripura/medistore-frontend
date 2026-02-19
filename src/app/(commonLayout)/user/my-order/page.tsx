@@ -1,6 +1,6 @@
 import MainContainer from "@/components/shared/mainContainer/MainContainer";
 import PaginationControls from "@/components/ui/pagination-controls";
-import MyOrder from "@/modules/seller/myOrder/Myorder";
+import UserMyOrder from "@/modules/seller/myOrder/UserMyOrder";
 import { orderServices } from "@/services/order.services";
 import { Metadata } from "next";
 
@@ -22,14 +22,14 @@ export default async function MyOrderPage({
     totalPages: 1,
   };
   return (
-    <section className="md:pt-20 pt-12">
+    <section className="min-h-dvh">
       {data?.data.length === 0 ? (
         <div className="h-30 bg-blue-50 flex justify-center items-center">
           <p>You don&rsquo;t have any order</p>
         </div>
       ) : (
         <MainContainer>
-          <MyOrder orderData={data?.data} />
+          <UserMyOrder orderData={data?.data} />
           <PaginationControls meta={pagination} />
         </MainContainer>
       )}

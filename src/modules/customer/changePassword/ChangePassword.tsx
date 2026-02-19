@@ -1,6 +1,5 @@
 "use client";
 
-import { updateUser } from "@/actions/users.action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -51,7 +50,7 @@ export function ChangePassword({
         });
         if (data) {
           setLoading(false);
-          toast.success("User Logged in Successfully");
+          toast.success("Password Reset Successfully");
           form.reset();
         }
         if (error) {
